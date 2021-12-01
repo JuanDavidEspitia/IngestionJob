@@ -16,9 +16,10 @@ class Ingestion (
   /**
    * Globals Variables
    */
-  var pathInput:String = ""
-  var pathOutput:String = ""
+  var projectId:String = ""
+  var datasetBQ:String = "ds_maestro"
   var delimiter:String = "|"
+  val tmpBucketGSC:String = "bdb-gcp-cds-storage-dataproc"
 
   /**
    * Globals Dataframes
@@ -41,6 +42,19 @@ class Ingestion (
       .option("timestampFormat", "yyyy-MM-dd hh:mm:ss")
       .option("mode", "PERMISSIVE")
       .load(table)
+    println(s"The numbers rows are: ${dfSource.count()}")
+    println(s"The number colums are: ${dfSource.columns.length}")
+
+    println(s"s[END] Load data table of: ${table}")
+
+    println(s"s[START] Write data table in BQ")
+    dfSource.write
+      .format("bigquery")
+      .mode("overwrite")
+      .option("temporaryGcsBucket", tmpBucketGSC)
+      .option("table", schema + "." + table) //customers_dataset.customers_output
+      .save()
+    println(s"s[END] Write data table in BQ")
 
 
 
