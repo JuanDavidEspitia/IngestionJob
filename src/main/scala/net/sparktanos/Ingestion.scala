@@ -47,7 +47,7 @@ class Ingestion (
 
     println(s"s[END] Load data table of: ${table}")
 
-    println(s"s[START] Write data table in BQ")
+    println(s"s[START] Write data table in BQ Without partitioned")
     dfSource.write
       .format("bigquery")
       .mode("overwrite")
