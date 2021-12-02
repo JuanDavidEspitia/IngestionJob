@@ -20,7 +20,7 @@ class Ingestion (
   var datasetBQ:String = "maestro"
   var tableBQ:String = "BDB_CUSTOMERS"
   var delimiter:String = "|"
-  val tmpBucketGSC:String = "bdb-gcp-cds-storage-dataproc"
+  val tmpBucketGSC:String = "bdb-gcp-qa-cds-storage-dataproc"
 
   /**
    * Globals Dataframes
