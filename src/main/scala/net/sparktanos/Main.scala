@@ -6,7 +6,7 @@ import scopt.OptionParser
 case class Config (
                     schema: String = null,
                     table: String = null,
-                    parition: String = null,
+                    partition: String = null,
                     descPartition: String = null
                   )
 
@@ -15,7 +15,7 @@ object Main {
   val nameApp:String = "ExportJob"
   var schema: String = null
   var table: String = null
-  var parition: String = null
+  var partition: String = null
   var descPartition: String = null
   val spark = SparkSession
     .builder
@@ -36,10 +36,10 @@ object Main {
           .required()
           .action((x,c) => c.copy(table = x))
           .text("table to write in BQ")
-        opt[String]('p', "parition")
+        opt[String]('p', "partition")
           .required()
-          .action((x,c) => c.copy(parition = x))
-          .text("parition table")
+          .action((x,c) => c.copy(partition = x))
+          .text("partition table")
         opt[String]('d', "descPartition")
           .action((x,c) => c.copy(descPartition = x))
           .text("description of partition table")
@@ -49,7 +49,7 @@ object Main {
       parser.parse(args, Config()) map { config =>
         schema = config.schema
         table = config.table
-        parition = config.parition
+        partition = config.partition
         descPartition = config.descPartition
 
         println("[END] Scopt Parser Arguments")
@@ -57,14 +57,14 @@ object Main {
         val arg: String = "Arguments used are: \n- " +
           "Schema: " + schema + "\n- " +
           "Table: " + table + "\n- " +
-          "Partition: " + parition + "\n- " +
+          "Partition: " + partition + "\n- " +
           "Description Partition: " + descPartition
         //showing args
         println(arg)
 
         println("[START] Process Ingestion Job")
-        //val ingestion = new Ingestion(formatInput, useCase, inputLocation, delimiter, partition, targetLocation, key, infoEncrypt, tblsecurity)
-        //ingestion.initProcess()
+        val ingestion = new Ingestion(schema, table, partition, descPartition)
+        ingestion.initProcess()
         println("[END] Finish Process")
         spark.stop()
 
