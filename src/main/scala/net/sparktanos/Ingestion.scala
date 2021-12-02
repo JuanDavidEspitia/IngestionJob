@@ -45,6 +45,7 @@ class Ingestion (
       .load(table)
     println(s"The numbers rows are: ${dfSource.count()}")
     println(s"The number colums are: ${dfSource.columns.length}")
+    dfSource.printSchema()
 
     println(s"s[END] Load data table of: ${table}")
 
