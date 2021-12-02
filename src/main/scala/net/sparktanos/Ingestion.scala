@@ -59,7 +59,7 @@ class Ingestion (
     println(s"s[START] Write data table in BQ Without partitioned")
     dfSource.write
       .format("bigquery")
-      .mode("overwrite")
+      .mode("append")
       .option("temporaryGcsBucket", tmpBucketGSC)
       .option("partitionField", "partitionDaily")
       .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
