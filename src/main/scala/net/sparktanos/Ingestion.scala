@@ -47,9 +47,10 @@ class Ingestion (
     println(s"The numbers rows are: ${dfSource.count()}")
     println(s"The number colums are: ${dfSource.columns.length}")
 
-    dfSource = dfSource.withColumn("fecha_cargue", to_date(concat(col("toDate")), "yyyyMMdd"))
+    //dfSource = dfSource.withColumn("fecha_cargue", to_date(concat(col("toDate")), "yyyyMMdd"))
     //dfSource = dfSource.withColumn("fecha_cargue", dfSource.col("fecha_cargue").cast(Date))
     //dfSource = dfSource.withColumn("fecha_cargue", date_format(current_timestamp(), "yyyyMMdd"))
+    dfSource = dfSource.withColumn("partitionDaily", to_date(col("fecha_cargue").cast("string"), "yyyyMMdd"))
     dfSource.show(5)
     dfSource.printSchema()
 
@@ -60,7 +61,7 @@ class Ingestion (
       .format("bigquery")
       .mode("overwrite")
       .option("temporaryGcsBucket", tmpBucketGSC)
-      .option("partitionField", "fecha_cargue")
+      .option("partitionField", "partitionDaily")
       .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
       .save()
     println(s"s[END] Write data table in BQ")
