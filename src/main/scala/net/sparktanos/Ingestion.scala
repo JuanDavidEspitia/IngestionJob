@@ -54,6 +54,7 @@ class Ingestion (
       .format("bigquery")
       .mode("overwrite")
       .option("temporaryGcsBucket", tmpBucketGSC)
+      .option("partitionField", "fecha_cargue")
       .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
       .save()
     println(s"s[END] Write data table in BQ")
