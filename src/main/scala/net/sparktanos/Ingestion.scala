@@ -4,6 +4,7 @@ import net.sparktanos.Main.spark
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType, TimestampType, DateType}
 
 class Ingestion (
                   schema: String,
@@ -45,6 +46,11 @@ class Ingestion (
       .load(table)
     println(s"The numbers rows are: ${dfSource.count()}")
     println(s"The number colums are: ${dfSource.columns.length}")
+
+    dfSource = dfSource.withColumn("fecha_cargue", to_date(concat(col("toDate")), "yyyyMMdd"))
+    //dfSource = dfSource.withColumn("fecha_cargue", dfSource.col("fecha_cargue").cast(Date))
+    //dfSource = dfSource.withColumn("fecha_cargue", date_format(current_timestamp(), "yyyyMMdd"))
+    dfSource.show(5)
     dfSource.printSchema()
 
     println(s"s[END] Load data table of: ${table}")
