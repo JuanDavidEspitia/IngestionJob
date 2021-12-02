@@ -17,7 +17,8 @@ class Ingestion (
    * Globals Variables
    */
   var projectId:String = ""
-  var datasetBQ:String = "ds_maestro"
+  var datasetBQ:String = "maestro"
+  var tableBQ:String = "BDB_CUSTOMERS"
   var delimiter:String = "|"
   val tmpBucketGSC:String = "bdb-gcp-cds-storage-dataproc"
 
@@ -52,7 +53,7 @@ class Ingestion (
       .format("bigquery")
       .mode("overwrite")
       .option("temporaryGcsBucket", tmpBucketGSC)
-      .option("table", schema + "." + table) //customers_dataset.customers_output
+      .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
       .save()
     println(s"s[END] Write data table in BQ")
 
