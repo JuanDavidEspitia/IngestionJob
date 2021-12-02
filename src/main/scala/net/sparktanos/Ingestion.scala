@@ -61,6 +61,7 @@ class Ingestion (
       .format("bigquery")
       .mode("append")
       .option("temporaryGcsBucket", tmpBucketGSC)
+      .option("datePartition", "YYYYMMDD")
       .option("partitionField", "partitionDaily")
       .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
       .save()
