@@ -62,6 +62,7 @@ class Ingestion (
       .mode("append")
       .option("temporaryGcsBucket", tmpBucketGSC)
       .option("partitionField", "partitionDaily")
+      .option("partitionType", "DAY")
       .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
       .save()
     println(s"s[END] Write data table in BQ")
