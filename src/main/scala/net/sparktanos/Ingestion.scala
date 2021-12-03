@@ -45,34 +45,63 @@ class Ingestion (
       .load(pathInput)
     println(s"The numbers rows are: ${dfSource.count()}")
     println(s"The number colums are: ${dfSource.columns.length}")
-
-    //dfSource = dfSource.withColumn("fecha_cargue", to_date(concat(col("toDate")), "yyyyMMdd"))
-    //dfSource = dfSource.withColumn("fecha_cargue", dfSource.col("fecha_cargue").cast(Date))
-    //dfSource = dfSource.withColumn("fecha_cargue", date_format(current_timestamp(), "yyyyMMdd"))
-    dfSource = dfSource.withColumn("partitionDaily", to_date(col("fecha_cargue").cast("string"), "yyyyMMdd"))
     dfSource.show(5)
     dfSource.printSchema()
-
     println(s"s[END] Load data table of: ${table}")
 
-    println(s"s[START] Write data table in BQ Without partitioned")
-    dfSource.write
-      .format("bigquery")
-      .mode("append")
-      .option("temporaryGcsBucket", tmpBucketGSC)
-      .option("partitionField", "partitionDaily")
-      .option("partitionType", "DAY")
-      .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
-      .save()
-    println(s"s[END] Write data table in BQ")
 
-    //.option("partitionField", "partitionDaily")
-    //.option("partitionType", "MONTH") -- solo es concepto en BQ -> para las tablas mensuales
-    //.option("project", "bigquery-project-id")
-    //.save("dataset.table") --> esta sera la version de escribir en BQ
+    if(frecuency == "D"){
+      println("The Frecuency table is DAILY")
+
+      //dfSource = dfSource.withColumn("fecha_cargue", to_date(concat(col("toDate")), "yyyyMMdd"))
+      //dfSource = dfSource.withColumn("fecha_cargue", dfSource.col("fecha_cargue").cast(Date))
+      //dfSource = dfSource.withColumn("fecha_cargue", date_format(current_timestamp(), "yyyyMMdd"))
+      dfSource = dfSource.withColumn("partition", to_date(col("fecha_cargue").cast("string"), "yyyyMMdd"))
 
 
+      println(s"s[START] Write data table in BQ With partition")
+      dfSource.write
+        .format("bigquery")
+        .mode("append")
+        .option("project", projectId)
+        .option("temporaryGcsBucket", tmpBucketGSC)
+        .option("partitionField", "partition")
+        .option("partitionType", "DAY")
+        .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
+        .save()
+      println(s"s[END] Write data table in BQ")
 
+      //.option("partitionField", "partitionDaily")
+      //.option("partitionType", "MONTH") -- solo es concepto en BQ -> para las tablas mensuales
+      //.option("project", "bigquery-project-id")
+      //.option("datePartition", "YYYYMMDD")
+      //.save("dataset.table") --> esta sera la version de escribir en BQ
+      spark.stop()
+
+    }else if(frecuency =="M"){
+      println("The Frecuency table is MONTH")
+
+      dfSource = dfSource.withColumn("partition", to_date(col("fecha_cargue").cast("string"), "yyyyMM"))
+
+      println(s"s[START] Write data table in BQ With partition")
+      dfSource.write
+        .format("bigquery")
+        .mode("append")
+        .option("project", projectId)
+        .option("temporaryGcsBucket", tmpBucketGSC)
+        .option("partitionField", "partition")
+        .option("partitionType", "MONTH")
+        .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
+        .save()
+      println(s"s[END] Write data table in BQ")
+
+      spark.stop()
+
+
+    }else{
+      println("The frecuency is not define, please verify argument frecuency")
+      spark.stop()
+    }
 
 
 }

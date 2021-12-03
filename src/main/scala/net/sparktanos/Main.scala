@@ -77,13 +77,13 @@ object Main {
         println("[END] Scopt Parser Arguments")
 
         val arg: String = "Arguments used are: \n- " +
-          "PAth Input: " + pathInput + "\n- " +
-          "Schema: " + schema + "\n- " +
-          "Table: " + table + "\n- " +
-          "Partition: " + partition + "\n- " +
-          "Description Partition: " + descPartition + "\n- " +
-          "ID Project: " + projectId + "\n- " +
-          "Frecuency Extraction: " + frecuency + "\n- "
+          "[Required] Path Input: " + pathInput + "\n- " +
+          "[Required] Schema: " + schema + "\n- " +
+          "[Required] Table: " + table + "\n- " +
+          "[Required] Partition: " + partition + "\n- " +
+          "[Optional] Description Partition: " + descPartition + "\n- " +
+          "[Optional] ID Project: " + projectId + "\n- " +
+          "[Required] Frecuency Extraction: " + frecuency + "\n- "
 
         //showing args
         println(arg)
