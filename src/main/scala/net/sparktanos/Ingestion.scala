@@ -7,19 +7,18 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType, TimestampType, DateType}
 
 class Ingestion (
+                  pathInput: String,
                   schema: String,
                   table: String,
                   parition: String,
-                  descPartition: String
-
+                  descPartition: String,
+                  projectId: String,
+                  frecuency: String,
                 ){
 
   /**
    * Globals Variables
    */
-  var projectId:String = ""
-  var datasetBQ:String = "maestro"
-  var tableBQ:String = "BDB_CUSTOMERS"
   var delimiter:String = "|"
   val tmpBucketGSC:String = "bdb-gcp-qa-cds-storage-dataproc"
 
@@ -31,7 +30,7 @@ class Ingestion (
 
   def initProcess (): Unit={
     println("[START] Into function InitProcess IngestionJob")
-    println(s"s[START] Load data table of: ${table}")
+    println(s"s[START] Load data table of: ${pathInput}")
 
     dfSource = spark.read.format("com.databricks.spark.csv")
       .option("delimiter", delimiter)
@@ -43,7 +42,7 @@ class Ingestion (
       .option("nullValue", "null")
       .option("timestampFormat", "yyyy-MM-dd hh:mm:ss")
       .option("mode", "PERMISSIVE")
-      .load(table)
+      .load(pathInput)
     println(s"The numbers rows are: ${dfSource.count()}")
     println(s"The number colums are: ${dfSource.columns.length}")
 
@@ -63,11 +62,14 @@ class Ingestion (
       .option("temporaryGcsBucket", tmpBucketGSC)
       .option("partitionField", "partitionDaily")
       .option("partitionType", "DAY")
-      .option("table", datasetBQ + "." + tableBQ) //customers_dataset.customers_output
+      .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
       .save()
     println(s"s[END] Write data table in BQ")
 
-      //.option("partitionField", "partitionDaily")
+    //.option("partitionField", "partitionDaily")
+    //.option("partitionType", "MONTH") -- solo es concepto en BQ -> para las tablas mensuales
+    //.option("project", "bigquery-project-id")
+    //.save("dataset.table") --> esta sera la version de escribir en BQ
 
 
 
