@@ -77,9 +77,10 @@ class Ingestion (
       //.save("dataset.table") --> esta sera la version de escribir en BQ
 
       // Perform word count.
+      println("[START Load dataframe by SQL Sintaxt")
       val dfCountPartitions = spark.sql(
         s"SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'")
-
+      println("[START] Show partitions")
       dfCountPartitions.show(false)
 
 
