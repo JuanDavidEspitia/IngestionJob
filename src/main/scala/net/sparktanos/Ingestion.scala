@@ -76,15 +76,7 @@ class Ingestion (
       //.option("datePartition", "YYYYMMDD")
       //.save("dataset.table") --> esta sera la version de escribir en BQ
 
-      // Perform word count.
-      println("[START Load dataframe by SQL Sintaxt")
-      val dfCountPartitions = spark.sql(
-        s"SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'")
-      println("[START] Show partitions")
-      dfCountPartitions.show(false)
 
-
-      spark.stop()
 
     }else if(frecuency =="M"){
       println("The Frecuency table is MONTH")
@@ -103,7 +95,7 @@ class Ingestion (
         .save()
       println(s"s[END] Write data table in BQ")
 
-      spark.stop()
+
 
 
     }else{
@@ -111,6 +103,37 @@ class Ingestion (
       spark.stop()
     }
 
+
+    // Reading Data from Bigquery by SQL Sintax
+    println("[START Load dataframe by SQL Sintaxt")
+    spark.conf.set("viewsEnabled","true")
+    //spark.conf.set("materializationDataset","<dataset>")
+
+    var sql = """
+      SELECT tag, COUNT(*) c
+      FROM (
+        SELECT SPLIT(tags, '|') tags
+        FROM `bigquery-public-data.stackoverflow.posts_questions` a
+        WHERE EXTRACT(YEAR FROM creation_date)>=2014
+      ), UNNEST(tags) tag
+      GROUP BY 1
+      ORDER BY 2 DESC
+      LIMIT 10
+      """
+    var df = spark.read.format("bigquery").load(sql)
+    df.show()
+
+
+
+
+
+
+    val dfCountPartitions = spark.sql(
+      s"SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'")
+    println("[START] Show partitions")
+    dfCountPartitions.show(false)
+
+    spark.stop()
 
 }
 
