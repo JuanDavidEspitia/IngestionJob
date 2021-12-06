@@ -70,12 +70,19 @@ class Ingestion (
         .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
         .save()
       println(s"s[END] Write data table in BQ")
-
       //.option("partitionField", "partitionDaily")
       //.option("partitionType", "MONTH") -- solo es concepto en BQ -> para las tablas mensuales
       //.option("project", "bigquery-project-id")
       //.option("datePartition", "YYYYMMDD")
       //.save("dataset.table") --> esta sera la version de escribir en BQ
+
+      // Perform word count.
+      val dfCountPartitions = spark.sql(
+        s"SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'")
+
+      dfCountPartitions.show(false)
+
+
       spark.stop()
 
     }else if(frecuency =="M"){
