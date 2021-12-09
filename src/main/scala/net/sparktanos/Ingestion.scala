@@ -103,7 +103,39 @@ class Ingestion (
       spark.stop()
     }
 
+    println("[START]  Load Data from BQ by QUERY SQL")
+    var sql = s"""
+              SELECT table_catalog, table_schema, table_name, partition_id
+              FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS`
+              WHERE table_name = '$table'
+              """
+    val df = spark.read
+      .format("bigquery")
+      .option("viewsEnabled","true")
+      .option("materializationDataset", schema)
+      .option("query", sql)
+      .load()
+      .cache()
+    df.show()
+    spark.stop()
 
+
+
+
+    /* leer data de BQ con filtros
+    val df = spark.read.format("bigquery")
+      .option("table", "bigquery-public-data.samples.github_nested")
+      .load()
+      .where("payload.pull_request.user.id > 500 and repository.url='https://github.com/bitcoin/bitcoin'")
+      .select("payload.pull_request.user.url")
+      .distinct
+      .as[String]
+      .sort("payload.pull_request.user.url")
+      .take(3)
+     */
+
+
+    /*
     // Reading Data from Bigquery by SQL Sintax
     println("[START Load dataframe by SQL Sintaxt")
     spark.conf.set("viewsEnabled","true")
@@ -124,13 +156,17 @@ class Ingestion (
     df.show()
 
     var sql2 = s"""
-     SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'
+     SELECT table_catalog, table_schema, table_name, partition_id FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'
         """
     var df2 = spark.read.format("bigquery").load(sql2)
     df2.show()
 
 
-    spark.stop()
+
+ */
+
+
+
 
 }
 
