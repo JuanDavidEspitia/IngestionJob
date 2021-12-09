@@ -70,13 +70,13 @@ class Ingestion (
         .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
         .save()
       println(s"s[END] Write data table in BQ")
-
       //.option("partitionField", "partitionDaily")
       //.option("partitionType", "MONTH") -- solo es concepto en BQ -> para las tablas mensuales
       //.option("project", "bigquery-project-id")
       //.option("datePartition", "YYYYMMDD")
       //.save("dataset.table") --> esta sera la version de escribir en BQ
-      spark.stop()
+
+
 
     }else if(frecuency =="M"){
       println("The Frecuency table is MONTH")
@@ -95,7 +95,7 @@ class Ingestion (
         .save()
       println(s"s[END] Write data table in BQ")
 
-      spark.stop()
+
 
 
     }else{
@@ -103,6 +103,34 @@ class Ingestion (
       spark.stop()
     }
 
+
+    // Reading Data from Bigquery by SQL Sintax
+    println("[START Load dataframe by SQL Sintaxt")
+    spark.conf.set("viewsEnabled","true")
+    spark.conf.set("materializationDataset", schema)
+
+    var sql = """
+      SELECT tag, COUNT(*) c
+      FROM (
+        SELECT SPLIT(tags, '|') tags
+        FROM `bigquery-public-data.stackoverflow.posts_questions` a
+        WHERE EXTRACT(YEAR FROM creation_date)>=2014
+      ), UNNEST(tags) tag
+      GROUP BY 1
+      ORDER BY 2 DESC
+      LIMIT 10
+      """
+    var df = spark.read.format("bigquery").load(sql)
+    df.show()
+
+    var sql2 = s"""
+     SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'
+        """
+    var df2 = spark.read.format("bigquery").load(sql2)
+    df2.show()
+
+
+    spark.stop()
 
 }
 
