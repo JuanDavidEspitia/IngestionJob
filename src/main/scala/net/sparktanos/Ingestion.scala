@@ -107,7 +107,7 @@ class Ingestion (
     // Reading Data from Bigquery by SQL Sintax
     println("[START Load dataframe by SQL Sintaxt")
     spark.conf.set("viewsEnabled","true")
-    //spark.conf.set("materializationDataset","<dataset>")
+    spark.conf.set("materializationDataset", schema)
 
     var sql = """
       SELECT tag, COUNT(*) c
@@ -123,15 +123,12 @@ class Ingestion (
     var df = spark.read.format("bigquery").load(sql)
     df.show()
 
+    var sql2 = s"""
+     SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'
+        """
+    var df2 = spark.read.format("bigquery").load(sql2)
+    df2.show()
 
-
-
-
-
-    val dfCountPartitions = spark.sql(
-      s"SELECT * FROM `$projectId.$schema.INFORMATION_SCHEMA.PARTITIONS` WHERE table_name = '$table'")
-    println("[START] Show partitions")
-    dfCountPartitions.show(false)
 
     spark.stop()
 
