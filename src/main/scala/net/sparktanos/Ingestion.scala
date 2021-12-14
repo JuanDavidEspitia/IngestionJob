@@ -66,6 +66,7 @@ class Ingestion (
         .option("project", projectId)
         .option("temporaryGcsBucket", tmpBucketGSC)
         .option("partitionField", "partition")
+        .option("clusteredFields", "id_type, id_number")
         .option("partitionType", "DAY")
         .option("table", schema + "." + table) //customers_dataset.customers_output  --> esta opcion quedara obsoleta a futuro
         .save()
