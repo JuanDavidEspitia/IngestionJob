@@ -1,5 +1,5 @@
 name := "IngestionJob"
-version := "1.0.0"
+version := "1.0.3"
 scalaVersion := "2.12.11"
 organization := "net.sparktanos.ingestionjob"
 val sparkVersion = "3.1.1"
